@@ -1,29 +1,19 @@
-namespace MiApp.Application.Common;
-
-public class Result<T>
+namespace MiApp.Application.Common
 {
-    public bool Success { get; init; }
-
-    public string? Message { get; init; }
-
-    public T? Data { get; init; }
-
-    public static Result<T> Ok(T data, string? message = null)
+    public class Result<T>
     {
-        return new Result<T>
-        {
-            Success = true,
-            Data = data,
-            Message = message
-        };
-    }
+        public bool IsSuccess { get; }
+        public T? Value { get; }
+        public string? Error { get; }
 
-    public static Result<T> Fail(string message)
-    {
-        return new Result<T>
+        private Result(bool isSuccess, T? value, string? error)
         {
-            Success = false,
-            Message = message
-        };
+            IsSuccess = isSuccess;
+            Value = value;
+            Error = error;
+        }
+
+        public static Result<T> Success(T value) => new Result<T>(true, value, null);
+        public static Result<T> Failure(string error) => new Result<T>(false, default, error);
     }
 }

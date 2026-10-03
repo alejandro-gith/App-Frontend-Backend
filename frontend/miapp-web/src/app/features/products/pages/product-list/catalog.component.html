@@ -1,0 +1,27 @@
+<div class="catalog-container">
+  <h2>Catálogo de Productos</h2>
+  
+  <div class="filters" style="margin-bottom: 20px;">
+    <button *ngFor="let cat of categories" 
+            (click)="filterByCategory(cat)"
+            [style.fontWeight]="selectedCategory === cat ? 'bold' : 'normal'"
+            style="margin-right: 10px; padding: 5px 15px;">
+      {{ cat }}
+    </button>
+  </div>
+
+  <div class="product-grid" style="display: flex; gap: 20px; flex-wrap: wrap;" *ngIf="products.length > 0; else noProducts">
+    <div class="product-card" *ngFor="let p of products" style="border: 1px solid #ccc; padding: 15px; width: 200px; text-align: center;">
+      <img [src]="p.imageUrl" [alt]="p.name" style="max-width: 100%; height: auto;">
+      <h3>{{ p.name }}</h3>
+      <p class="price" style="color: green; font-weight: bold;">${{ p.price }}</p>
+      <p class="category" style="color: gray; font-size: 12px;">{{ p.category }}</p>
+      
+      <a [routerLink]="['/catalog', p.id]" style="display: block; margin-top: 10px; text-decoration: none; color: blue;">Ver Detalle</a>
+    </div>
+  </div>
+
+  <ng-template #noProducts>
+    <p>No hay productos disponibles en esta categoría.</p>
+  </ng-template>
+</div>

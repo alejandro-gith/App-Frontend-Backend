@@ -1,56 +1,30 @@
 using MiApp.Domain.Entities;
 using MiApp.Domain.Interfaces;
 using MiApp.Infrastructure.Data;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace MiApp.Infrastructure.Repositories;
-
-public class ProductRepository : IProductRepository
+namespace MiApp.Infrastructure.Repositories
 {
-    public IEnumerable<Product> GetAll()
+    public class ProductRepository : IProductRepository
     {
-        return InMemoryData.Products;
-    }
+        public Task<IEnumerable<Product>> GetAllAsync()
+        {
+            return Task.FromResult(InMemoryData.Products.AsEnumerable());
+        }
 
-    public Product? GetById(int id)
-    {
-        return InMemoryData.Products
-            .FirstOrDefault(product => product.Id == id);
-    }
+        public Task<IEnumerable<Product>> GetByCategoryAsync(string category)
+        {
+            var products = InMemoryData.Products
+                .Where(p => p.Category.Equals(category, System.StringComparison.OrdinalIgnoreCase));
+            return Task.FromResult(products);
+        }
 
-    public Product Add(Product product)
-    {
-        product.Id = InMemoryData.Products.Count == 0
-            ? 1
-            : InMemoryData.Products.Max(p => p.Id) + 1;
-
-        InMemoryData.Products.Add(product);
-
-        return product;
-    }
-
-    public bool Update(Product product)
-    {
-        var existingProduct = GetById(product.Id);
-
-        if (existingProduct is null)
-            return false;
-
-        existingProduct.Title = product.Title;
-        existingProduct.Price = product.Price;
-        existingProduct.Category = product.Category;
-        existingProduct.Description = product.Description;
-        existingProduct.Image = product.Image;
-
-        return true;
-    }
-
-    public bool Delete(int id)
-    {
-        var product = GetById(id);
-
-        if (product is null)
-            return false;
-
-        return InMemoryData.Products.Remove(product);
+        public Task<Product?> GetByIdAsync(int id)
+        {
+            var product = InMemoryData.Products.FirstOrDefault(p => p.Id == id);
+            return Task.FromResult(product);
+        }
     }
 }

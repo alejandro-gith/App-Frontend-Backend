@@ -1,0 +1,27 @@
+<div class="detail-container" *ngIf="product; else loadingOrError" style="padding: 20px;">
+  
+  <a routerLink="/catalog" style="text-decoration: none; color: blue;">← Volver al Catálogo</a>
+  
+  <div class="detail-card" style="margin-top: 20px; border: 1px solid #ccc; padding: 20px; max-width: 400px;">
+    <img [src]="product.imageUrl" [alt]="product.name" style="max-width: 100%; height: auto;">
+    <div class="info">
+      <h2>{{ product.name }}</h2>
+      <p class="category" style="color: gray;">Categoría: {{ product.category }}</p>
+      <p class="price" style="color: green; font-size: 20px; font-weight: bold;">Precio: ${{ product.price }}</p>
+      <p class="description">{{ product.description }}</p>
+      
+      <p class="stock" [style.color]="product.stock < 10 ? 'red' : 'black'">
+        Stock disponible: {{ product.stock }}
+      </p>
+      
+      <button style="margin-top: 15px; padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer;">
+        Añadir al Carrito
+      </button> 
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingOrError>
+  <p *ngIf="error" style="color: red; font-weight: bold;">{{ error }}</p>
+  <p *ngIf="!error">Cargando detalles...</p>
+</ng-template>

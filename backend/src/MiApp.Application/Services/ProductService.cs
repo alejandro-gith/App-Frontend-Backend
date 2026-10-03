@@ -1,76 +1,66 @@
 using MiApp.Application.Common;
-using MiApp.Application.DTOs.Products;
+using MiApp.Application.DTOs;
 using MiApp.Application.Interfaces;
-using MiApp.Domain.Entities;
 using MiApp.Domain.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace MiApp.Application.Services;
-
-public class ProductService : IProductService
+namespace MiApp.Application.Services
 {
-    private readonly IProductRepository _productRepository;
-
-    public ProductService(IProductRepository productRepository)
+    public class ProductService : IProductService
     {
-        _productRepository = productRepository;
-    }
+        private readonly IProductRepository _productRepository;
 
-    public IEnumerable<Product> GetAll()
-    {
-        return _productRepository.GetAll();
-    }
-
-    public Product? GetById(int id)
-    {
-        return _productRepository.GetById(id);
-    }
-
-    public Result<Product> Create(CreateProductRequest request)
-    {
-        if (string.IsNullOrWhiteSpace(request.Title))
-            return Result<Product>.Fail("El título es obligatorio.");
-
-        if (request.Price <= 0)
-            return Result<Product>.Fail(
-                "El precio debe ser mayor a cero."
-            );
-
-        if (string.IsNullOrWhiteSpace(request.Category))
-            return Result<Product>.Fail(
-                "La categoría es obligatoria."
-            );
-
-        if (string.IsNullOrWhiteSpace(request.Description))
-            return Result<Product>.Fail(
-                "La descripción es obligatoria."
-            );
-
-        if (!Uri.TryCreate(
-                request.Image,
-                UriKind.Absolute,
-                out var imageUri) ||
-            (imageUri.Scheme != Uri.UriSchemeHttp &&
-             imageUri.Scheme != Uri.UriSchemeHttps))
+        public ProductService(IProductRepository productRepository)
         {
-            return Result<Product>.Fail(
-                "La URL de la imagen no es válida."
-            );
+            _productRepository = productRepository;
         }
 
-        var product = new Product
+        public async Task<Result<IEnumerable<ProductDto>>> GetCatalogAsync()
         {
-            Title = request.Title.Trim(),
-            Price = request.Price,
-            Category = request.Category.Trim(),
-            Description = request.Description.Trim(),
-            Image = request.Image.Trim()
-        };
+            var products = await _productRepository.GetAllAsync();
+            var dtos = products.Select(p => new ProductDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                Category = p.Category,
+                ImageUrl = p.ImageUrl
+            });
+            return Result<IEnumerable<ProductDto>>.Success(dtos);
+        }
 
-        var createdProduct = _productRepository.Add(product);
+        public async Task<Result<IEnumerable<ProductDto>>> GetCatalogByCategoryAsync(string category)
+        {
+            var products = await _productRepository.GetByCategoryAsync(category);
+            var dtos = products.Select(p => new ProductDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                Category = p.Category,
+                ImageUrl = p.ImageUrl
+            });
+            return Result<IEnumerable<ProductDto>>.Success(dtos);
+        }
 
-        return Result<Product>.Ok(
-            createdProduct,
-            "Producto creado correctamente."
-        );
+        public async Task<Result<ProductDetailDto>> GetProductDetailAsync(int id)
+        {
+            var product = await _productRepository.GetByIdAsync(id);
+            if (product == null) return Result<ProductDetailDto>.Failure("Producto no encontrado.");
+
+            var dto = new ProductDetailDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                Category = product.Category,
+                ImageUrl = product.ImageUrl,
+                Stock = product.Stock
+            };
+            return Result<ProductDetailDto>.Success(dto);
+        }
     }
 }

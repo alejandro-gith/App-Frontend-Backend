@@ -1,49 +1,42 @@
 using Microsoft.AspNetCore.Mvc;
-using MiApp.Application.DTOs.Products;
 using MiApp.Application.Interfaces;
+using System.Threading.Tasks;
 
-namespace MiApp.API.Controllers;
-
-[ApiController]
-[Route("api/products")]
-public class ProductsController : ControllerBase
+namespace MiApp.API.Controllers
 {
-    private readonly IProductService _productService;
-
-    public ProductsController(IProductService productService)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ProductsController : ControllerBase
     {
-        _productService = productService;
-    }
+        private readonly IProductService _productService;
 
-    [HttpGet]
-    public IActionResult GetAll()
-    {
-        return Ok(_productService.GetAll());
-    }
+        public ProductsController(IProductService productService)
+        {
+            _productService = productService;
+        }
 
-    [HttpGet("{id:int}")]
-    public IActionResult GetById(int id)
-    {
-        var product = _productService.GetById(id);
+        [HttpGet]
+        public async Task<IActionResult> GetProducts()
+        {
+            var result = await _productService.GetCatalogAsync();
+            if (!result.IsSuccess) return BadRequest(result.Error);
+            return Ok(result.Value);
+        }
 
-        if (product is null)
-            return NotFound();
+        [HttpGet("category/{category}")]
+        public async Task<IActionResult> GetProductsByCategory(string category)
+        {
+            var result = await _productService.GetCatalogByCategoryAsync(category);
+            if (!result.IsSuccess) return BadRequest(result.Error);
+            return Ok(result.Value);
+        }
 
-        return Ok(product);
-    }
-
-    [HttpPost]
-    public IActionResult Create(CreateProductRequest request)
-    {
-        var result = _productService.Create(request);
-
-        if (!result.Success)
-            return BadRequest(result);
-
-        return CreatedAtAction(
-            nameof(GetById),
-            new { id = result.Data!.Id },
-            result
-        );
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProductDetail(int id)
+        {
+            var result = await _productService.GetProductDetailAsync(id);
+            if (!result.IsSuccess) return NotFound(result.Error);
+            return Ok(result.Value);
+        }
     }
 }
