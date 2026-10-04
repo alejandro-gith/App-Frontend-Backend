@@ -1,0 +1,103 @@
+/* US06: estilos del formulario "Nuevo producto".
+   Diseño de tarjeta centrada, con todos los campos apilados en vertical. */
+
+/* Fondo de toda la pantalla del formulario */
+:host {
+  display: block;
+  min-height: 100vh;
+  padding: 32px 16px;
+  background: #f4f6fa;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+/* Tarjeta blanca centrada que contiene el formulario */
+.form-container {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 28px 32px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* Enlace "Volver al Catálogo" */
+.form-container a {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #007bff;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.form-container h2 {
+  margin: 4px 0 20px;
+  color: #1f2937;
+}
+
+/* El formulario apila los campos uno debajo de otro */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Cada etiqueta ocupa su propia línea, encima de su campo */
+label {
+  display: block;
+  margin-top: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #374151;
+}
+
+/* Todos los campos ocupan el ancho completo de la tarjeta */
+input,
+select,
+textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+/* Resalta el campo que se está editando */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+/* Mensajes de error de validación debajo de cada campo */
+small {
+  display: block;
+  color: #c62828;
+  font-size: 12px;
+}
+
+/* Botón principal, ancho completo */
+button {
+  margin-top: 20px;
+  padding: 12px;
+  background: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) { background: #0069d9; }
+button:disabled { background: #9bbfe8; cursor: not-allowed; }
+
+/* Mensajes de éxito y error del servidor */
+.alert { padding: 10px 12px; border-radius: 8px; margin: 12px 0; font-size: 14px; }
+.alert.success { background: #e6f4ea; color: #1e7a34; }
+.alert.error { background: #fdecea; color: #c62828; }

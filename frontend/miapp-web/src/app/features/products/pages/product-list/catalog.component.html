@@ -1,5 +1,11 @@
 <div class="catalog-container">
   <h2>Catálogo de Productos</h2>
+
+  <!-- US06: enlace al formulario, visible solo para el Administrador -->
+  <a *ngIf="isAdmin" routerLink="/catalog/new"
+     style="display: inline-block; margin-bottom: 15px; padding: 8px 16px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px;">
+    + Nuevo producto
+  </a>
   
   <div class="filters" style="margin-bottom: 20px;">
     <button *ngFor="let cat of categories" 
