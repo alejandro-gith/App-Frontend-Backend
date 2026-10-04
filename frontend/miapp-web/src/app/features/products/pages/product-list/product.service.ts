@@ -38,4 +38,10 @@ export class ProductService {
   updateProduct(id: number, request: UpdateProductRequest): Observable<ProductDetail> {
     return this.http.put<ProductDetail>(`${this.apiUrl}/${id}`, request);
   }
+
+    // US08: envía un DELETE al backend para eliminar el producto con el id indicado.
+  // El backend responde 204 (sin contenido), por eso el Observable es de tipo void.
+  deleteProduct(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }

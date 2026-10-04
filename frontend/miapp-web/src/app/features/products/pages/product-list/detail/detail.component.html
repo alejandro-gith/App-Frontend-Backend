@@ -1,4 +1,9 @@
-<div class="detail-container" *ngIf="product; else loadingOrError" style="padding: 20px;">
+<!-- US08: mensaje de éxito tras eliminar (después se vuelve al catálogo) -->
+<p *ngIf="deleted" style="padding: 20px; color: #1e7a34; font-weight: bold;">
+  Producto eliminado correctamente. Volviendo al catálogo...
+</p>
+
+<div class="detail-container" *ngIf="product && !deleted; else loadingOrError" style="padding: 20px;">
   
   <a routerLink="/catalog" style="text-decoration: none; color: blue;">← Volver al Catálogo</a>
   
@@ -23,11 +28,36 @@
          style="display: inline-block; margin-top: 15px; margin-left: 10px; padding: 10px 20px; background-color: #ffc107; color: #000; text-decoration: none;">
         Editar producto
       </a>
+
+      <!-- US08: botón para eliminar el producto, visible solo para el Administrador.
+           No borra directamente: primero abre la confirmación. -->
+      <button *ngIf="isAdmin && !showConfirm" (click)="askDelete()"
+              style="margin-top: 15px; margin-left: 10px; padding: 10px 20px; background-color: #dc3545; color: white; border: none; cursor: pointer;">
+        Eliminar producto
+      </button>
+
+      <!-- US08: confirmación antes de eliminar -->
+      <div *ngIf="showConfirm" style="margin-top: 15px; padding: 12px; border: 1px solid #dc3545; background-color: #fdecea;">
+        <p style="margin: 0 0 10px;">
+          ¿Seguro que deseas eliminar <strong>{{ product.name }}</strong>? Esta acción no se puede deshacer.
+        </p>
+        <button (click)="confirmDelete()" [disabled]="deleting"
+                style="padding: 8px 16px; background-color: #dc3545; color: white; border: none; cursor: pointer;">
+          {{ deleting ? 'Eliminando...' : 'Sí, eliminar' }}
+        </button>
+        <button (click)="cancelDelete()" [disabled]="deleting"
+                style="margin-left: 8px; padding: 8px 16px; background-color: #6c757d; color: white; border: none; cursor: pointer;">
+          Cancelar
+        </button>
+      </div>
+
+      <!-- US08: error si la eliminación falla -->
+      <p *ngIf="deleteError" style="margin-top: 10px; color: #c62828; font-weight: bold;">{{ deleteError }}</p>
     </div>
   </div>
 </div>
 
 <ng-template #loadingOrError>
   <p *ngIf="error" style="color: red; font-weight: bold;">{{ error }}</p>
-  <p *ngIf="!error">Cargando detalles...</p>
+  <p *ngIf="!error && !deleted">Cargando detalles...</p>
 </ng-template>
