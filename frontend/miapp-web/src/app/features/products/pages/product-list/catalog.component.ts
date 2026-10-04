@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ProductService } from './product.service'; 
@@ -15,7 +15,10 @@ export class CatalogComponent implements OnInit {
   categories: string[] = ['Todos', 'Computacion', 'Accesorios'];
   selectedCategory: string = 'Todos';
 
-  constructor(private productService: ProductService) {}
+  constructor(
+    private productService: ProductService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loadProducts();
@@ -23,7 +26,10 @@ export class CatalogComponent implements OnInit {
 
   loadProducts(): void {
     this.productService.getProducts().subscribe({
-      next: (data: Product[]) => this.products = data, 
+      next: (data: Product[]) => {
+        this.products = data;
+        this.cdr.markForCheck();
+      },
       error: (err: any) => console.error('Error al cargar productos', err) 
     });
   }
@@ -34,7 +40,10 @@ export class CatalogComponent implements OnInit {
       this.loadProducts();
     } else {
       this.productService.getProductsByCategory(category).subscribe({
-        next: (data: Product[]) => this.products = data, 
+        next: (data: Product[]) => {
+          this.products = data;
+          this.cdr.markForCheck();
+        },
         error: (err: any) => console.error('Error al filtrar', err) 
       });
     }
