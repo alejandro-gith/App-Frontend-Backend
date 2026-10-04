@@ -13,5 +13,9 @@ namespace MiApp.Domain.Interfaces
         // US06: contrato para guardar un producto nuevo.
         // Recibe el producto sin ID y devuelve el mismo producto ya guardado, con su ID asignado.
         Task<Product> AddAsync(Product product);
+
+        // US07: contrato para actualizar un producto existente (se identifica por su Id).
+        // Devuelve true si lo encontró y lo actualizó, o false si no existe.
+        Task<bool> UpdateAsync(Product product);
     }
 }

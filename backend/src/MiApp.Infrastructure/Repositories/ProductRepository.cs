@@ -44,5 +44,19 @@ namespace MiApp.Infrastructure.Repositories
             // Devuelve el producto con su ID para que el servicio lo use en la respuesta
             return Task.FromResult(product);
         }
+
+
+                // US07: reemplaza en la lista en memoria el producto que tenga el mismo Id.
+        // Devuelve false si no existe ninguno con ese Id (el servicio lo traduce a "no encontrado").
+        public Task<bool> UpdateAsync(Product product)
+        {
+            // Busca la posición del producto dentro de la lista
+            var index = InMemoryData.Products.FindIndex(p => p.Id == product.Id);
+            if (index < 0) return Task.FromResult(false);
+
+            // Reemplaza el producto viejo por el actualizado
+            InMemoryData.Products[index] = product;
+            return Task.FromResult(true);
+        }
 }
 }
