@@ -9,14 +9,16 @@ import { AuthService } from '../../../../core/services/auth.service'; // US06
   selector: 'app-catalog',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './catalog.component.html'
+  templateUrl: './catalog.component.html',
+  styleUrl: './catalog.component.css' // style: archivo de estilos del catálogo
 })
 export class CatalogComponent implements OnInit {
   products: Product[] = [];
   categories: string[] = ['Todos', 'Computacion', 'Accesorios'];
   selectedCategory: string = 'Todos';
 
-  // US06: true si el usuario es Administrator (controla si se ve el botón "Nuevo producto")
+  // US06: true si el usuario es Administrator (controla si se ve el botón "Nuevo producto").
+  // Solo oculta/muestra el botón: la seguridad real debe estar en el backend.
   isAdmin: boolean = false;
 
   constructor(
@@ -26,7 +28,6 @@ export class CatalogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // US06: solo oculta/muestra el botón. La seguridad real está en el backend.
     this.isAdmin = this.authService.getRole() === 'Administrator';
     this.loadProducts();
   }

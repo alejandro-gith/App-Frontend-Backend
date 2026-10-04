@@ -18,8 +18,10 @@
         <p class="stock" [class.low]="product.stock < 10">Stock disponible: {{ product.stock }}</p>
 
         <div class="actions">
-          <!-- Se oculta al Administrador: comprar es una función del Cliente (solo afecta la vista; el backend del carrito debe validar el rol) -->
+          <!-- Se oculta al Administrador: comprar es una función del Cliente.
+               Solo afecta la vista; el backend del carrito debe validar el rol. -->
           <button *ngIf="!isAdmin" class="btn btn-primary">Añadir al Carrito</button>
+
           <!-- US07: editar, visible solo para el Administrador -->
           <a *ngIf="isAdmin" class="btn btn-warning" [routerLink]="['/catalog', product.id, 'edit']">
             Editar producto

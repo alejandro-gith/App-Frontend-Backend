@@ -9,7 +9,8 @@ import { AuthService } from '../../../../../core/services/auth.service'; // US07
   selector: 'app-detail',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './detail.component.html'
+  templateUrl: './detail.component.html',
+  styleUrl: './detail.component.css' // style: archivo de estilos del detalle
 })
 export class DetailComponent implements OnInit {
   product: ProductDetail | null = null;
