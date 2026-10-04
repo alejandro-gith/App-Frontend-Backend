@@ -1,15 +1,16 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router'; // US07: ruta y navegación
+import { Observable } from 'rxjs'; // US07
 
 import { ProductService } from '../product-list/product.service';
-import { Product } from '../../../../core/models/product.model';
+import { Product, ProductDetail } from '../../../../core/models/product.model';
 import { CreateProductRequest } from '../../../../core/models/create-product-request.model';
 
-// US06: formulario para que el Administrador cree un producto nuevo.
-// Este componente solo maneja la pantalla y el formulario; la comunicación HTTP
-// la hace ProductService (separación de responsabilidades).
+// US06/US07: formulario de producto. Sirve para CREAR (ruta /catalog/new)
+// y para EDITAR (ruta /catalog/:id/edit). Solo maneja la pantalla y el formulario;
+// la comunicación HTTP la hace ProductService (separación de responsabilidades).
 @Component({
   selector: 'app-product-form',
   standalone: true,
@@ -21,6 +22,16 @@ export class ProductFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private productService = inject(ProductService);
   private cdr = inject(ChangeDetectorRef);
+  private route = inject(ActivatedRoute); // US07: para leer el :id de la URL
+  private router = inject(Router);        // US07: para volver al detalle al terminar
+
+  // US07: id del producto que se edita. Es null cuando se está creando uno nuevo.
+  productId: number | null = null;
+
+  // US07: true si la pantalla está en modo edición
+  get isEditMode(): boolean {
+    return this.productId !== null;
+  }
 
   // Opciones del desplegable de categoría (se obtienen de los productos existentes)
   categories: string[] = [];
@@ -29,6 +40,10 @@ export class ProductFormComponent implements OnInit {
   loading = false;
   successMessage = '';
   errorMessage = '';
+
+  // US07: estados de la carga del producto en modo edición
+  loadingProduct = false; // mientras se piden los datos del producto
+  loadFailed = false;     // true si el producto no se pudo cargar (por ejemplo, no existe)
 
   // Formulario reactivo con las validaciones del lado del cliente (mejoran la experiencia de usuario).
   // El backend vuelve a validar todo: Angular no es la autoridad final.
@@ -40,9 +55,16 @@ export class ProductFormComponent implements OnInit {
     image: ['', [Validators.required, Validators.pattern(/^https?:\/\/.+/i)]]
   });
 
-  // Al abrir la pantalla, carga las categorías para el desplegable
+  // Al abrir la pantalla: carga las categorías y, si hay :id en la ruta, el producto a editar
   ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    this.productId = idParam ? Number(idParam) : null;
+
     this.loadCategories();
+
+    if (this.productId !== null) {
+      this.loadProductForEdit(this.productId);
+    }
   }
 
   // Obtiene los productos y saca la lista de categorías sin repetir, ordenadas
@@ -59,13 +81,39 @@ export class ProductFormComponent implements OnInit {
     });
   }
 
+  // US07: pide el producto al backend y rellena el formulario con sus datos actuales.
+  // Ojo con los nombres: el detalle usa name/imageUrl y el formulario usa title/image.
+  private loadProductForEdit(id: number): void {
+    this.loadingProduct = true;
+
+    this.productService.getProductById(id).subscribe({
+      next: (product: ProductDetail) => {
+        this.form.patchValue({
+          title: product.name,
+          price: product.price,
+          category: product.category,
+          description: product.description,
+          image: product.imageUrl
+        });
+        this.loadingProduct = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.loadingProduct = false;
+        this.loadFailed = true;
+        this.errorMessage = 'Producto no encontrado.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
   // Indica si un campo tiene un error concreto y ya fue tocado (para mostrar el mensaje en rojo)
   hasError(field: string, error: string): boolean {
     const control = this.form.get(field);
     return !!control && control.touched && control.hasError(error);
   }
 
-  // Se ejecuta al enviar el formulario
+  // Se ejecuta al enviar el formulario (crea o edita según el modo)
   onSubmit(): void {
     this.successMessage = '';
     this.errorMessage = '';
@@ -76,7 +124,7 @@ export class ProductFormComponent implements OnInit {
       return;
     }
 
-    // Arma el cuerpo de la petición con los nombres que espera el backend (CreateProductRequest)
+    // Arma el cuerpo de la petición con los nombres que espera el backend
     const value = this.form.getRawValue();
     const request: CreateProductRequest = {
       title: value.title ?? '',
@@ -88,13 +136,26 @@ export class ProductFormComponent implements OnInit {
 
     this.loading = true; // deshabilita el botón para evitar envíos dobles
 
-    this.productService.createProduct(request).subscribe({
-      next: (created: Product) => {
+    // US07: en modo edición usa PUT; en modo creación usa POST
+    const request$: Observable<{ id: number }> = this.isEditMode
+      ? this.productService.updateProduct(this.productId!, request)
+      : this.productService.createProduct(request);
+
+    request$.subscribe({
+      next: (saved: { id: number }) => {
         this.loading = false;
-        this.successMessage = `Producto creado correctamente. ID asignado: ${created.id}`;
-        // Limpia el formulario para poder agregar otro producto
-        this.form.reset({ title: '', price: null, category: '', description: '', image: '' });
-        this.cdr.markForCheck();
+
+        if (this.isEditMode) {
+          // US07: muestra el mensaje y vuelve al detalle, que ya mostrará los datos nuevos
+          this.successMessage = 'Producto actualizado correctamente.';
+          this.cdr.markForCheck();
+          setTimeout(() => this.router.navigate(['/catalog', saved.id]), 1200);
+        } else {
+          // US06: muestra el ID asignado y limpia el formulario para agregar otro
+          this.successMessage = `Producto creado correctamente. ID asignado: ${saved.id}`;
+          this.form.reset({ title: '', price: null, category: '', description: '', image: '' });
+          this.cdr.markForCheck();
+        }
       },
       error: (err: any) => {
         this.loading = false;
@@ -108,8 +169,9 @@ export class ProductFormComponent implements OnInit {
   private getErrorMessage(err: any): string {
     if (err.status === 0) return 'No se pudo conectar con el servidor.';
     if (err.status === 401) return 'Tu sesión expiró. Inicia sesión de nuevo.';
-    if (err.status === 403) return 'No tienes permiso para crear productos.';
+    if (err.status === 403) return 'No tienes permiso para realizar esta acción.';
+    if (err.status === 404) return 'El producto ya no existe.'; // US07
     if (err.status === 400 && typeof err.error === 'string') return err.error;
-    return 'Ocurrió un error inesperado al crear el producto.';
+    return 'Ocurrió un error inesperado al guardar el producto.';
   }
 }

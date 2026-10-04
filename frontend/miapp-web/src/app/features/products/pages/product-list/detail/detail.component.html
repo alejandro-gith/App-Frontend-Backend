@@ -17,6 +17,12 @@
       <button style="margin-top: 15px; padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer;">
         Añadir al Carrito
       </button> 
+
+      <!-- US07: botón para editar el producto, visible solo para el Administrador -->
+      <a *ngIf="isAdmin" [routerLink]="['/catalog', product.id, 'edit']"
+         style="display: inline-block; margin-top: 15px; margin-left: 10px; padding: 10px 20px; background-color: #ffc107; color: #000; text-decoration: none;">
+        Editar producto
+      </a>
     </div>
   </div>
 </div>

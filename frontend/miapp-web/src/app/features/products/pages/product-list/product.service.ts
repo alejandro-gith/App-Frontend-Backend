@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product, ProductDetail } from '../../../../core/models/product.model';
 import { CreateProductRequest } from '../../../../core/models/create-product-request.model'; // US06
+import { UpdateProductRequest } from '../../../../core/models/update-product-request.model'; // US07
 
 @Injectable({
   providedIn: 'root'
@@ -30,5 +31,11 @@ export class ProductService {
   // El interceptor de autenticación agrega el token automáticamente.
   createProduct(request: CreateProductRequest): Observable<Product> {
     return this.http.post<Product>(this.apiUrl, request);
+  }
+
+  // US07: envía un PUT al backend para editar el producto con el id indicado.
+  // Recibe el id y los datos nuevos; devuelve el detalle del producto ya actualizado.
+  updateProduct(id: number, request: UpdateProductRequest): Observable<ProductDetail> {
+    return this.http.put<ProductDetail>(`${this.apiUrl}/${id}`, request);
   }
 }

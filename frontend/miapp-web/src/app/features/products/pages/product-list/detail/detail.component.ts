@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProductService } from '../product.service';
 import { ProductDetail } from '../../../../../core/models/product.model';
+import { AuthService } from '../../../../../core/services/auth.service'; // US07
 
 @Component({
   selector: 'app-detail',
@@ -14,13 +15,19 @@ export class DetailComponent implements OnInit {
   product: ProductDetail | null = null;
   error: string = '';
 
+  // US07: true si el usuario es Administrator (controla si se ve el botón "Editar producto").
+  // Solo mejora la experiencia: la seguridad real debe estar en el backend.
+  isAdmin: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService // US07
   ) {}
 
   ngOnInit(): void {
+    this.isAdmin = this.authService.getRole() === 'Administrator'; // US07
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       this.loadDetail(Number(idParam));

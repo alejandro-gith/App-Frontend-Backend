@@ -31,6 +31,12 @@ export const routes: Routes = [
     component: ProductFormComponent,
     canActivate: [authGuard, adminGuard]
   },
+  // US07: editar un producto. Reutiliza el mismo formulario, que detecta el :id y entra en modo edición.
+  {
+    path: 'catalog/:id/edit',
+    component: ProductFormComponent,
+    canActivate: [authGuard, adminGuard]
+  },
   {
     path: 'catalog/:id',
     component: DetailComponent,
