@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProductService } from '../product.service';
@@ -16,7 +16,8 @@ export class DetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private productService: ProductService
+    private productService: ProductService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -28,8 +29,14 @@ export class DetailComponent implements OnInit {
 
   loadDetail(id: number): void {
     this.productService.getProductById(id).subscribe({
-      next: (data: ProductDetail) => this.product = data,
-      error: (err: any) => this.error = 'Producto no encontrado'
+      next: (data: ProductDetail) => {
+        this.product = data;
+        this.cdr.markForCheck();
+      },
+      error: (err: any) => {
+        this.error = 'Producto no encontrado';
+        this.cdr.markForCheck();
+      }
     });
   }
 }
