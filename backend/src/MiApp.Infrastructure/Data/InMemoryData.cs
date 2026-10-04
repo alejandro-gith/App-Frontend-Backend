@@ -50,7 +50,7 @@ namespace MiApp.Infrastructure.Data
                 Description = "Laptop de alto rendimiento.",
                 Price = 1500.00m,
                 Category = "Computacion",
-                ImageUrl = "https://via.placeholder.com/150",
+                ImageUrl = "https://picsum.photos/id/0/300/200",
                 Stock = 10
             },
 
@@ -61,7 +61,7 @@ namespace MiApp.Infrastructure.Data
                 Description = "Teclado con switches red.",
                 Price = 100.00m,
                 Category = "Accesorios",
-                ImageUrl = "https://via.placeholder.com/150",
+                ImageUrl = "https://picsum.photos/id/0/300/200",
                 Stock = 25
             },
 
@@ -72,7 +72,7 @@ namespace MiApp.Infrastructure.Data
                 Description = "Monitor IPS 27 pulgadas.",
                 Price = 350.00m,
                 Category = "Computacion",
-                ImageUrl = "https://via.placeholder.com/150",
+                ImageUrl = "https://picsum.photos/id/0/300/200",
                 Stock = 5
             }
         };
