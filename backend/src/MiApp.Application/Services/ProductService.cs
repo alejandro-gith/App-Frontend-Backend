@@ -147,6 +147,18 @@ namespace MiApp.Application.Services
             return Result<ProductDetailDto>.Success(dto);
         }
 
+                // US08: elimina un producto existente.
+        // Recibe el id (de la URL). Devuelve éxito si se eliminó, o "no encontrado" (404) si no existe.
+        public async Task<Result<bool>> DeleteProductAsync(int id)
+        {
+            // El repositorio devuelve false cuando no hay ningún producto con ese id
+            var deleted = await _productRepository.DeleteAsync(id);
+            if (!deleted)
+                return Result<bool>.NotFound("Producto no encontrado.");
+
+            return Result<bool>.Success(true);
+        }
+
         // US06/US07: validaciones comunes de los datos de un producto.
         // Devuelve el mensaje del primer error encontrado, o null si todo es válido.
         private static string? ValidateProductFields(

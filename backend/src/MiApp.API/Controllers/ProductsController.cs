@@ -71,5 +71,21 @@ namespace MiApp.API.Controllers
 
             return Ok(result.Value);
         }
+
+                // US08: DELETE api/products/{id}. Elimina un producto existente.
+        // Responde 204 No Content si se eliminó, o 404 si el id no existe.
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            var result = await _productService.DeleteProductAsync(id);
+
+            // El producto no existe
+            if (result.IsNotFound) return NotFound(result.Error);
+
+            if (!result.IsSuccess) return BadRequest(result.Error);
+
+            // 204: eliminado correctamente, sin cuerpo en la respuesta
+            return NoContent();
+        }
     }
 }

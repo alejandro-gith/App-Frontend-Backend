@@ -17,5 +17,9 @@ namespace MiApp.Domain.Interfaces
         // US07: contrato para actualizar un producto existente (se identifica por su Id).
         // Devuelve true si lo encontró y lo actualizó, o false si no existe.
         Task<bool> UpdateAsync(Product product);
+
+        // US08: contrato para eliminar el producto con el id indicado.
+        // Devuelve true si lo eliminó, o false si no existía.
+        Task<bool> DeleteAsync(int id);
     }
 }

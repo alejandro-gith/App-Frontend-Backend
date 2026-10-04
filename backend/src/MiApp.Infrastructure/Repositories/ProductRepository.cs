@@ -58,5 +58,18 @@ namespace MiApp.Infrastructure.Repositories
             InMemoryData.Products[index] = product;
             return Task.FromResult(true);
         }
+
+                // US08: quita de la lista en memoria el producto con el id indicado.
+        // Devuelve false si no existía (el servicio lo traduce a "no encontrado").
+        public Task<bool> DeleteAsync(int id)
+        {
+            // Busca el producto dentro de la lista
+            var product = InMemoryData.Products.FirstOrDefault(p => p.Id == id);
+            if (product == null) return Task.FromResult(false);
+
+            // Lo elimina de la lista que hace de "base de datos"
+            InMemoryData.Products.Remove(product);
+            return Task.FromResult(true);
+        }
 }
 }

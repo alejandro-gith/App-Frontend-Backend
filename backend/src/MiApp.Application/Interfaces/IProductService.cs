@@ -17,5 +17,9 @@ namespace MiApp.Application.Interfaces
         // US07: edita el producto con el id indicado. Devuelve el detalle actualizado,
         // o un fallo "no encontrado" / "datos inválidos".
         Task<Result<ProductDetailDto>> UpdateProductAsync(int id, UpdateProductRequest request);
+
+        // US08: elimina el producto con el id indicado.
+        // Devuelve éxito si se eliminó, o un fallo "no encontrado" si no existe.
+        Task<Result<bool>> DeleteProductAsync(int id);
     }
 }
