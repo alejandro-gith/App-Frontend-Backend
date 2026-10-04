@@ -9,5 +9,9 @@ namespace MiApp.Domain.Interfaces
         Task<IEnumerable<Product>> GetAllAsync();
         Task<IEnumerable<Product>> GetByCategoryAsync(string category);
         Task<Product?> GetByIdAsync(int id);
+
+        // US06: contrato para guardar un producto nuevo.
+        // Recibe el producto sin ID y devuelve el mismo producto ya guardado, con su ID asignado.
+        Task<Product> AddAsync(Product product);
     }
 }
