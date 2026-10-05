@@ -1,0 +1,22 @@
+<div class="product-card">
+  <h3>{{ product.name }}</h3>
+  <p>Precio: ${{ product.price }}</p>
+
+  <!-- Ocultar completamente los controles de adición al carrito si el usuario es Auditor -->
+  <div *ngIf="!isAuditor">
+    <form [formGroup]="cartForm" (ngSubmit)="onAddToCart()">
+      <label for="quantity">Cantidad:</label>
+      <input id="quantity" type="number" formControlName="quantity" min="1" />
+
+      <button type="submit" [disabled]="cartForm.invalid">
+        Agregar al carrito
+      </button>
+    </form>
+  </div>
+
+  <p *ngIf="isAuditor" class="read-only-badge">
+    Modo Lectura (Auditor)
+  </p>
+
+  <p *ngIf="message" class="alert-info">{{ message }}</p>
+</div>

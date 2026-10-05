@@ -8,9 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 // --- 1. Registro de Servicios (ANTES de builder.Build()) ---
 builder.Services.AddControllers();
 
-// Inyección de Dependencias
+// Inyección de Dependencias - Productos
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+// Inyección de Dependencias - Carrito (NUEVAS LÍNEAS)
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<ICartService, CartService>();
 
 // Configuración de CORS para Angular
 builder.Services.AddCors(options =>
