@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CartService } from '../../../../../core/services/cart.service';
-import { AuthService } from '../../../../../core/services/auth.service';
-import { Cart, CartItem } from '../../../../../core/models/cart.model';
-
+import { CartService } from '../../../../core/services/cart.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { Cart } from '../../../../core/models/cart.model';
 @Component({
   selector: 'app-cart-detail',
   standalone: true,
@@ -76,17 +75,15 @@ export class CartDetailComponent implements OnInit {
 
   // US10: Cálculo del Total con 2 decimales
   calculateTotal(): void {
-    if (!this.cart || !this.cart.items || this.cart.items.length === 0) {
-      this.totalAmount = 0;
-      return;
-    }
-
-    const rawTotal = this.cart.items.reduce((sum, item) => {
-      const price = item.unitPrice || 0;
-      return sum + (price * item.quantity);
-    }, 0);
-
-    // Redondeo a 2 decimales
-    this.totalAmount = Math.round(rawTotal * 100) / 100;
+  if (!this.cart || !this.cart.products || this.cart.products.length === 0) {
+    this.totalAmount = 0;
+    return;
   }
+
+  const rawTotal = this.cart.products.reduce((sum, item) => {
+    return sum + (item.unitPrice * item.quantity);
+  }, 0);
+
+  this.totalAmount = Math.round(rawTotal * 100) / 100;
+}
 }

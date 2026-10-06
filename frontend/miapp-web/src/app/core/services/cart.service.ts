@@ -7,7 +7,7 @@ import { AddToCartRequest, Cart, UpdateCartItemRequest } from '../models/cart.mo
   providedIn: 'root'
 })
 export class CartService {
-  private readonly apiUrl = 'http://localhost:5000/api/carts'; // Ajustar puerto si es necesario
+  private readonly apiUrl = 'http://localhost:5051/api/carts'; // Ajustar puerto si es necesario
 
   constructor(private http: HttpClient) {}
 

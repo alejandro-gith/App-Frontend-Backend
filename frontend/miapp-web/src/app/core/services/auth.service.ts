@@ -98,4 +98,19 @@ isAuthenticated(): boolean {
   getUsername(): string | null {
     return localStorage.getItem('username');
   }
+  getCurrentUser(): { id: number; username: string; role: string } | null {
+  const userId = localStorage.getItem('userId');
+  const username = localStorage.getItem('username');
+  const role = localStorage.getItem('role');
+
+  if (!userId || !username || !role) {
+    return null;
+  }
+
+  return {
+    id: Number(userId),
+    username,
+    role
+  };
+}
 }

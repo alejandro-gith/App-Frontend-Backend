@@ -1,11 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { AuthService } from '../../../../core/services/auth.service';
+import {
+  ProductService,
+  Product
+} from '../../../../core/services/product.service';
+
+import { ProductCardComponent }
+  from './components/product-card/product-card.component';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
+  imports: [
+    CommonModule,
+    ProductCardComponent
+  ],
   template: `
     <h1>Productos</h1>
 
@@ -15,14 +27,63 @@ import { AuthService } from '../../../../core/services/auth.service';
     <button (click)="logout()">
       Cerrar sesión
     </button>
+
+    <hr>
+
+    <p *ngIf="loading">
+      Cargando productos...
+    </p>
+
+    <p *ngIf="errorMessage">
+      {{ errorMessage }}
+    </p>
+
+    <div
+      *ngIf="!loading && products.length > 0"
+      class="product-grid">
+
+      <app-product-card
+        *ngFor="let product of products"
+        [product]="product">
+      </app-product-card>
+
+    </div>
   `
 })
-export class ProductList {
+export class ProductList implements OnInit {
+
+  products: Product[] = [];
+
+  loading = true;
+
+  errorMessage = '';
 
   constructor(
     public authService: AuthService,
+    private productService: ProductService,
     private router: Router
   ) {}
+
+  ngOnInit(): void {
+    this.loadProducts();
+  }
+
+  loadProducts(): void {
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.productService.getProducts().subscribe({
+      next: (products) => {
+        this.products = products;
+        this.loading = false;
+      },
+      error: () => {
+        this.errorMessage =
+          'No se pudieron cargar los productos.';
+        this.loading = false;
+      }
+    });
+  }
 
   logout(): void {
     this.authService.logout();
