@@ -3,7 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 
 import { LoginRequest } from '../../features/auth/models/login-request';
-import { LoginResponse } from '../../features/auth/models/login-response';
+import {
+  LoginData,
+  LoginResponse
+} from '../../features/auth/models/login-response';
 
 @Injectable({
   providedIn: 'root'
@@ -22,32 +25,32 @@ export class AuthService {
       )
       .pipe(
         tap(response => {
-          if (response.success) {
-            this.saveSession(response);
+          if (response.isSuccess && response.value) {
+            this.saveSession(response.value);
           }
         })
       );
   }
 
-  private saveSession(response: LoginResponse): void {
+  private saveSession(data: LoginData): void {
     localStorage.setItem(
       'token',
-      response.data.token
+      data.token
     );
 
     localStorage.setItem(
       'userId',
-      response.data.userId.toString()
+      data.userId.toString()
     );
 
     localStorage.setItem(
       'username',
-      response.data.username
+      data.username
     );
 
     localStorage.setItem(
       'role',
-      response.data.role
+      data.role
     );
   }
 
@@ -61,31 +64,31 @@ export class AuthService {
     localStorage.removeItem('cart');
   }
 
-isAuthenticated(): boolean {
-  const token = this.getToken();
+  isAuthenticated(): boolean {
+    const token = this.getToken();
 
-  if (!token) {
-    return false;
-  }
-
-  try {
-    const payload = JSON.parse(
-      atob(token.split('.')[1])
-    );
-
-    const expiration = payload.exp * 1000;
-
-    if (Date.now() >= expiration) {
-      this.logout();
+    if (!token) {
       return false;
     }
 
-    return true;
-  } catch {
-    this.logout();
-    return false;
+    try {
+      const payload = JSON.parse(
+        atob(token.split('.')[1])
+      );
+
+      const expiration = payload.exp * 1000;
+
+      if (Date.now() >= expiration) {
+        this.logout();
+        return false;
+      }
+
+      return true;
+    } catch {
+      this.logout();
+      return false;
+    }
   }
-}
 
   getToken(): string | null {
     return localStorage.getItem('token');
