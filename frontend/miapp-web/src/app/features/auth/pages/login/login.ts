@@ -54,11 +54,16 @@ export class Login {
     this.loading = true;
 
     this.authService.login(credentials).subscribe({
+
       next: response => {
         this.loading = false;
 
-        if (response.success) {
-          this.router.navigate(['/products']);
+        if (response.isSuccess && response.value) {
+          this.router.navigate(['/catalog']);
+        } else {
+          this.errorMessage =
+            response.error ??
+            'No fue posible iniciar sesión.';
         }
       },
 
@@ -66,9 +71,10 @@ export class Login {
         this.loading = false;
 
         this.errorMessage =
-          error.error?.message ??
+          error.error?.error ??
           'Usuario o contraseña incorrectos.';
       }
+
     });
   }
 }

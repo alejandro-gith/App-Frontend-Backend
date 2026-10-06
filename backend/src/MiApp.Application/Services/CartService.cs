@@ -18,7 +18,7 @@ public class CartService : ICartService
         _productRepository = productRepository;
     }
 
-    public Cart AddToCart(AddToCartRequest request)
+    public async Task<Cart> AddToCartAsync(AddToCartRequest request)
     {
         if (request.Quantity <= 0)
         {
@@ -27,7 +27,7 @@ public class CartService : ICartService
             );
         }
 
-        var product = _productRepository.GetById(request.ProductId);
+        var product = await _productRepository.GetByIdAsync(request.ProductId);
 
         if (product == null)
         {
@@ -52,9 +52,7 @@ public class CartService : ICartService
         }
 
         var existingItem = cart.Products
-            .FirstOrDefault(
-                i => i.ProductId == request.ProductId
-            );
+            .FirstOrDefault(i => i.ProductId == request.ProductId);
 
         if (existingItem != null)
         {
@@ -65,7 +63,10 @@ public class CartService : ICartService
             cart.Products.Add(new CartItem
             {
                 ProductId = request.ProductId,
-                Quantity = request.Quantity
+                Quantity = request.Quantity,
+                ProductName = product.Name,
+                UnitPrice = product.Price,
+                Image = product.ImageUrl
             });
         }
 
@@ -100,9 +101,7 @@ public class CartService : ICartService
         }
 
         var item = cart.Products
-            .FirstOrDefault(
-                i => i.ProductId == request.ProductId
-            );
+            .FirstOrDefault(i => i.ProductId == request.ProductId);
 
         if (item == null)
         {
@@ -130,9 +129,7 @@ public class CartService : ICartService
         }
 
         var item = cart.Products
-            .FirstOrDefault(
-                i => i.ProductId == productId
-            );
+            .FirstOrDefault(i => i.ProductId == productId);
 
         if (item == null)
         {

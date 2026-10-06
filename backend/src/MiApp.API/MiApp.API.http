@@ -1,6 +1,19 @@
-@MiApp.API_HostAddress = http://localhost:5150
+@MiApp_API_HostAddress = http://localhost:5150
 
-GET {{MiApp.API_HostAddress}}/weatherforecast/
-Accept: application/json
+### Login correcto
+POST {{MiApp_API_HostAddress}}/api/auth/login
+Content-Type: application/json
 
-###
+{
+  "username": "admin",
+  "password": "123"
+}
+
+### Login incorrecto
+POST {{MiApp_API_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "999"
+}

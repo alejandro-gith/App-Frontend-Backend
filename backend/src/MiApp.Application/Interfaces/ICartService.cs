@@ -5,8 +5,17 @@ namespace MiApp.Application.Interfaces;
 
 public interface ICartService
 {
-    Cart AddToCart(AddToCartRequest request);
+    Task<Cart> AddToCartAsync(AddToCartRequest request);
+
     Cart? GetByUserId(int userId);
-    Cart UpdateItemQuantity(int userId, UpdateCartItemRequest request);
-    Cart RemoveItem(int userId, int productId);
+
+    Cart UpdateItemQuantity(
+        int userId,
+        UpdateCartItemRequest request
+    );
+
+    Cart RemoveItem(
+        int userId,
+        int productId
+    );
 }

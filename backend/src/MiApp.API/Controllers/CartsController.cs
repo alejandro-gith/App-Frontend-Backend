@@ -15,20 +15,21 @@ public class CartsController : ControllerBase
         _cartService = cartService;
     }
 
-    [HttpPost]
-    public IActionResult AddToCart([FromBody] AddToCartRequest request)
+   [HttpPost]
+    public async Task<IActionResult> AddToCart(
+        [FromBody] AddToCartRequest request)
     {
-        try
-        {
-            var cart = _cartService.AddToCart(request);
-            return Ok(cart);
-        }
+    try
+    {
+        var cart = await _cartService.AddToCartAsync(request);
+        return Ok(cart);
+    }
         catch (ArgumentException ex)
         {
             return BadRequest(new { message = ex.Message });
         }
         catch (KeyNotFoundException ex)
-        {
+        {   
             return NotFound(new { message = ex.Message });
         }
     }

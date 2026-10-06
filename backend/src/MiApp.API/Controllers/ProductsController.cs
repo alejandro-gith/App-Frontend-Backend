@@ -1,49 +1,91 @@
 using Microsoft.AspNetCore.Mvc;
-using MiApp.Application.DTOs.Products;
+using MiApp.Application.DTOs; // US06/US07: necesario para reconocer CreateProductRequest y UpdateProductRequest
 using MiApp.Application.Interfaces;
+using System.Threading.Tasks;
 
-namespace MiApp.API.Controllers;
-
-[ApiController]
-[Route("api/products")]
-public class ProductsController : ControllerBase
+namespace MiApp.API.Controllers
 {
-    private readonly IProductService _productService;
-
-    public ProductsController(IProductService productService)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ProductsController : ControllerBase
     {
-        _productService = productService;
-    }
+        private readonly IProductService _productService;
 
-    [HttpGet]
-    public IActionResult GetAll()
-    {
-        return Ok(_productService.GetAll());
-    }
+        public ProductsController(IProductService productService)
+        {
+            _productService = productService;
+        }
 
-    [HttpGet("{id:int}")]
-    public IActionResult GetById(int id)
-    {
-        var product = _productService.GetById(id);
+        [HttpGet]
+        public async Task<IActionResult> GetProducts()
+        {
+            var result = await _productService.GetCatalogAsync();
+            if (!result.IsSuccess) return BadRequest(result.Error);
+            return Ok(result.Value);
+        }
 
-        if (product is null)
-            return NotFound();
+        [HttpGet("category/{category}")]
+        public async Task<IActionResult> GetProductsByCategory(string category)
+        {
+            var result = await _productService.GetCatalogByCategoryAsync(category);
+            if (!result.IsSuccess) return BadRequest(result.Error);
+            return Ok(result.Value);
+        }
 
-        return Ok(product);
-    }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProductDetail(int id)
+        {
+            var result = await _productService.GetProductDetailAsync(id);
+            if (!result.IsSuccess) return NotFound(result.Error);
+            return Ok(result.Value);
+        }
 
-    [HttpPost]
-    public IActionResult Create(CreateProductRequest request)
-    {
-        var result = _productService.Create(request);
+        // US06: POST api/products. Recibe los datos del producto nuevo en el cuerpo (JSON).
+        // El controller solo maneja HTTP: pasa los datos al servicio y traduce su resultado a un código HTTP.
+        [HttpPost]
+        public async Task<IActionResult> CreateProduct([FromBody] CreateProductRequest request)
+        {
+            // La validación y la lógica de negocio viven en el servicio, no aquí
+            var result = await _productService.CreateProductAsync(request);
 
-        if (!result.Success)
-            return BadRequest(result);
+            // Si el servicio rechazó los datos, responde 400 con el motivo
+            if (!result.IsSuccess) return BadRequest(result.Error);
 
-        return CreatedAtAction(
-            nameof(GetById),
-            new { id = result.Data!.Id },
-            result
-        );
+            // Si todo salió bien, responde 201 Created con el producto nuevo y su ID,
+            // e indica en la cabecera Location dónde consultarlo (el endpoint de detalle)
+            return CreatedAtAction(nameof(GetProductDetail), new { id = result.Value!.Id }, result.Value);
+        }
+
+        // US07: PUT api/products/{id}. Edita un producto existente con los datos del cuerpo (JSON).
+        // Responde 200 con el producto actualizado, 404 si el id no existe o 400 si los datos son inválidos.
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductRequest request)
+        {
+            var result = await _productService.UpdateProductAsync(id, request);
+
+            // El producto no existe
+            if (result.IsNotFound) return NotFound(result.Error);
+
+            // Los datos no cumplen las reglas de negocio
+            if (!result.IsSuccess) return BadRequest(result.Error);
+
+            return Ok(result.Value);
+        }
+
+                // US08: DELETE api/products/{id}. Elimina un producto existente.
+        // Responde 204 No Content si se eliminó, o 404 si el id no existe.
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            var result = await _productService.DeleteProductAsync(id);
+
+            // El producto no existe
+            if (result.IsNotFound) return NotFound(result.Error);
+
+            if (!result.IsSuccess) return BadRequest(result.Error);
+
+            // 204: eliminado correctamente, sin cuerpo en la respuesta
+            return NoContent();
+        }
     }
 }

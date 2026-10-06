@@ -1,0 +1,37 @@
+<!-- style: catalog rediseñado. La lógica es la misma: categorías, filtro, lista y botón de admin. -->
+<div class="catalog-container">
+
+  <div class="catalog-header">
+    <h2>Catálogo de Productos</h2>
+
+    <!-- US06: enlace al formulario, visible solo para el Administrador -->
+    <a *ngIf="isAdmin" routerLink="/catalog/new" class="btn-new">+ Nuevo producto</a>
+  </div>
+
+  <!-- Filtros por categoría; el botón seleccionado se resalta con la clase "active" -->
+  <div class="filters">
+    <button *ngFor="let cat of categories"
+            class="filter-btn"
+            [class.active]="selectedCategory === cat"
+            (click)="filterByCategory(cat)">
+      {{ cat }}
+    </button>
+  </div>
+
+  <!-- Cuadrícula de tarjetas de producto -->
+  <div class="product-grid" *ngIf="products.length > 0; else noProducts">
+    <div class="product-card" *ngFor="let p of products">
+      <img class="product-image" [src]="p.imageUrl" [alt]="p.name">
+      <div class="product-body">
+        <h3 class="product-name">{{ p.name }}</h3>
+        <span class="product-category">{{ p.category }}</span>
+        <p class="product-price">{{ p.price | currency }}</p>
+        <a class="product-link" [routerLink]="['/catalog', p.id]">Ver detalle</a>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noProducts>
+    <p class="empty-message">No hay productos disponibles en esta categoría.</p>
+  </ng-template>
+</div>
