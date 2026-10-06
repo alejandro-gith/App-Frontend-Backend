@@ -20,49 +20,54 @@ public class AuthService : IAuthService
 
     public Result<LoginResponse> Login(LoginRequest request)
     {
+        // Validar usuario vacío
         if (string.IsNullOrWhiteSpace(request.Username))
         {
-            return Result<LoginResponse>.Fail(
+            return Result<LoginResponse>.Failure(
                 "El usuario es obligatorio."
             );
         }
 
+        // Validar contraseña vacía
         if (string.IsNullOrWhiteSpace(request.Password))
         {
-            return Result<LoginResponse>.Fail(
+            return Result<LoginResponse>.Failure(
                 "La contraseña es obligatoria."
             );
         }
 
+        // Buscar usuario
         var user = _userRepository.GetByUsername(
             request.Username.Trim()
         );
 
+        // Validar existencia del usuario
         if (user is null)
         {
-            return Result<LoginResponse>.Fail(
+            return Result<LoginResponse>.Failure(
                 "Usuario o contraseña incorrectos."
             );
         }
 
+        // Validar contraseña
         if (user.Password != request.Password)
         {
-            return Result<LoginResponse>.Fail(
+            return Result<LoginResponse>.Failure(
                 "Usuario o contraseña incorrectos."
             );
         }
+
+        // Generar JWT
+        var token = _tokenService.GenerateToken(user);
 
         var response = new LoginResponse
         {
             UserId = user.Id,
             Username = user.Username,
             Role = user.Role.ToString(),
-            Token = _tokenService.GenerateToken(user)
+            Token = token
         };
 
-        return Result<LoginResponse>.Ok(
-            response,
-            "Inicio de sesión correcto."
-        );
+        return Result<LoginResponse>.Success(response);
     }
 }

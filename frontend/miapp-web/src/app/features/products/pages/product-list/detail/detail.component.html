@@ -1,0 +1,80 @@
+<!-- style: detalle rediseñado. La lógica es la misma: editar (US07), eliminar con confirmación (US08), mensajes. -->
+<div class="detail-container">
+
+  <!-- US08: mensaje de éxito tras eliminar (después se vuelve al catálogo) -->
+  <p *ngIf="deleted" class="alert success">Producto eliminado correctamente. Volviendo al catálogo...</p>
+
+  <ng-container *ngIf="product && !deleted; else loadingOrError">
+    
+    <div class="detail-navigation">
+      <a routerLink="/catalog" class="back-link">← Volver al Catálogo</a>
+
+      <a
+        *ngIf="isClient"
+        routerLink="/cart"
+        class="cart-link">
+        🛒 Ver carrito
+      </a>
+    </div>
+
+    <div class="detail-card">
+      <img class="detail-image" [src]="product.imageUrl" [alt]="product.name">
+
+      <div class="info">
+        <span class="category-badge">{{ product.category }}</span>
+        <h2>{{ product.name }}</h2>
+        <p class="price">{{ product.price | currency }}</p>
+        <p class="description">{{ product.description }}</p>
+        <p class="stock" [class.low]="product.stock < 10">Stock disponible: {{ product.stock }}</p>
+
+        <div class="actions">
+          <!-- Se oculta al Administrador: comprar es una función del Cliente.
+               Solo afecta la vista; el backend del carrito debe validar el rol. -->
+          <button
+            *ngIf="isClient"
+            class="btn btn-primary"
+            type="button"
+            (click)="addToCart()"
+            [disabled]="addingToCart || product.stock <= 0">
+            {{ addingToCart ? 'Añadiendo...' : 'Añadir al Carrito' }}
+          </button>
+
+          <!-- US07: editar, visible solo para el Administrador -->
+          <a *ngIf="isAdmin" class="btn btn-warning" [routerLink]="['/catalog', product.id, 'edit']">
+            Editar producto
+          </a>
+
+          <!-- US08: eliminar, visible solo para el Administrador. Primero abre la confirmación. -->
+          <button *ngIf="isAdmin && !showConfirm" class="btn btn-danger" (click)="askDelete()">
+            Eliminar producto
+          </button>
+        </div>
+
+        <p *ngIf="cartMessage" class="alert success">
+          {{ cartMessage }}
+        </p>
+
+        <p *ngIf="cartError" class="alert error">
+          {{ cartError }}
+        </p>
+
+        <!-- US08: confirmación antes de eliminar -->
+        <div *ngIf="showConfirm" class="confirm-box">
+          <p>¿Seguro que deseas eliminar <strong>{{ product.name }}</strong>? Esta acción no se puede deshacer.</p>
+          <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="deleting">
+            {{ deleting ? 'Eliminando...' : 'Sí, eliminar' }}
+          </button>
+          <button class="btn btn-secondary" (click)="cancelDelete()" [disabled]="deleting">Cancelar</button>
+        </div>
+
+        <!-- US08: error si la eliminación falla -->
+        <p *ngIf="deleteError" class="alert error">{{ deleteError }}</p>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #loadingOrError>
+    <p *ngIf="error" class="alert error">{{ error }}</p>
+    <p *ngIf="!error && !deleted" class="loading">Cargando detalles...</p>
+  </ng-template>
+</div>
