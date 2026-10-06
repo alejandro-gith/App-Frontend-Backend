@@ -64,12 +64,18 @@
         Total a pagar: ${{ totalAmount | number:'1.2-2' }}
       </h3>
 
+
       <button
         class="btn-checkout"
         [disabled]="cart.products.length === 0">
         Proceder al pago
       </button>
     </div>
+    <div class="mb-3">
+  <a routerLink="/catalog" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2">
+    <span>←</span> Volver al Catálogo
+  </a>
+</div>
   </div>
 
   <!-- Escenario US10: Carrito vacío -->
