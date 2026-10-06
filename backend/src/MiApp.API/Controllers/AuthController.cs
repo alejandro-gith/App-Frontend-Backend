@@ -20,7 +20,7 @@ public class AuthController : ControllerBase
     {
         var result = _authService.Login(request);
 
-        if (!result.Success)
+        if (!result.IsSuccess)
         {
             return Unauthorized(result);
         }
