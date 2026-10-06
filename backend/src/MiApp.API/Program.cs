@@ -19,6 +19,10 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 
+// Consulta global de carritos — US12
+builder.Services.AddScoped<ICartQueryService, CartQueryService>();
+builder.Services.AddScoped<ICartQueryRepository, CartQueryRepository>();
+
 // Configuración de JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"]
     ?? throw new InvalidOperationException("La clave JWT no está configurada.");
@@ -71,7 +75,7 @@ app.UseHttpsRedirection();
 // Activar CORS
 app.UseCors("Frontend");
 
-// Middlewares de Autenticación y Autorización (¡El orden importa!)
+// Middlewares de Autenticación y Autorización
 app.UseAuthentication();
 app.UseAuthorization();
 

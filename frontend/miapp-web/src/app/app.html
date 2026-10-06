@@ -1,1 +1,11 @@
+@if (authService.isAuthenticated()) {
+  <nav aria-label="Navegación principal">
+    <a routerLink="/products">Productos</a>
+
+    @if (canViewCarts()) {
+      <a routerLink="/carts">Carritos</a>
+    }
+  </nav>
+}
+
 <router-outlet></router-outlet>

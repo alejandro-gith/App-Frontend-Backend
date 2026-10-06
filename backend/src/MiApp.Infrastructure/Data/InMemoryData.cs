@@ -68,5 +68,28 @@ public static class InMemoryData
         }
     };
 
-    public static List<Cart> Carts { get; } = new();
+    public static List<Cart> Carts { get; } = new()
+{
+    new Cart
+    {
+        Id = 1,
+        UserId = 2,
+        Date = new DateTime(2026, 10, 5, 15, 0, 0, DateTimeKind.Utc),
+        Products = new List<CartItem>
+        {
+            new CartItem { ProductId = 1, Quantity = 1 },
+            new CartItem { ProductId = 3, Quantity = 2 }
+        }
+    },
+    new Cart
+    {
+        Id = 2,
+        UserId = 2,
+        Date = new DateTime(2026, 10, 6, 16, 0, 0, DateTimeKind.Utc),
+        Products = new List<CartItem>
+        {
+            new CartItem { ProductId = 2, Quantity = 1 }
+        }
+    }
+};
 }
