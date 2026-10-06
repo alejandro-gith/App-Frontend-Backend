@@ -1,8 +1,23 @@
-@if (canViewUsers()) {
+@if (authService.isAuthenticated()) {
   <nav aria-label="Menú principal">
-    <a routerLink="/products">Productos</a>
+
+    <a routerLink="/catalog">Catálogo</a>
+
+    @if (canViewUsers()) {
+      |
+      <a routerLink="/users">Usuarios</a>
+    }
+
+    @if (canViewCarts()) {
+      |
+      <a routerLink="/carts">Carritos</a>
+    }
+
     |
-    <a routerLink="/users">Usuarios</a>
+    <button type="button" (click)="logout()">
+      Cerrar sesión
+    </button>
+
   </nav>
 }
 

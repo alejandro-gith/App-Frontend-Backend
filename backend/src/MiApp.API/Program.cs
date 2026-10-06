@@ -23,10 +23,15 @@ builder.Services.AddScoped<ITokenService, JwtTokenService>();
 // US11 - Listado de usuarios
 builder.Services.AddScoped<IUserService, UserService>();
 
-// Carrito
+// Carrito - US09 y US10
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
 
+// Consulta global de carritos - US12
+builder.Services.AddScoped<ICartQueryService, CartQueryService>();
+builder.Services.AddScoped<ICartQueryRepository, CartQueryRepository>();
+
+// Configuración de JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"]
     ?? throw new InvalidOperationException(
         "La clave JWT no está configurada."

@@ -14,6 +14,9 @@ import { DetailComponent } from './features/products/pages/product-list/detail/d
 import { UserList } from './features/users/pages/user-list/user-list';
 import { usersGuard } from './core/guards/users-guard';
 
+import { CartList } from './features/carts/pages/cart-list/cart-list';
+import { cartsGuard } from './core/guards/carts-guard';
+
 export const routes: Routes = [
   {
     path: 'login',
@@ -66,6 +69,11 @@ export const routes: Routes = [
     path: 'users',
     component: UserList,
     canActivate: [usersGuard]
+  },
+  {
+    path: 'carts',
+    component: CartList,
+    canActivate: [cartsGuard]
   },
   {
     path: '',
