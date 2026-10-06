@@ -1,0 +1,55 @@
+<h1>Histórico global de carritos</h1>
+<p>Consulta los carritos y sus artículos.</p>
+
+@if (loading) {
+  <p role="status">Cargando carritos...</p>
+} @else if (error) {
+  <p role="alert">{{ error }}</p>
+  <button type="button" (click)="loadCarts()">
+    Reintentar
+  </button>
+} @else if (carts.length === 0) {
+  <p>No hay carritos registrados.</p>
+} @else {
+  @for (cart of carts; track cart.id) {
+    <article class="cart-card">
+      <h2>Carrito #{{ cart.id }}</h2>
+
+      <p>
+        <strong>Fecha de creación:</strong>
+        {{ cart.date | date:'dd/MM/yyyy HH:mm' }}
+      </p>
+
+      <p>
+        <strong>ID del usuario propietario:</strong>
+        {{ cart.userId }}
+      </p>
+
+      <details>
+        <summary>Ver productos ({{ cart.products.length }})</summary>
+
+        @if (cart.products.length === 0) {
+          <p>Este carrito no contiene productos.</p>
+        } @else {
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">ID del producto</th>
+                <th scope="col">Cantidad</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (item of cart.products; track $index) {
+                <tr>
+                  <td>{{ item.productId }}</td>
+                  <td>{{ item.quantity }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </details>
+    </article>
+  }
+}
