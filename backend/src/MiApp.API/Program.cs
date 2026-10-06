@@ -9,19 +9,23 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- 1. Registro de Servicios (ANTES de builder.Build()) ---
 builder.Services.AddControllers();
 
-// Inyección de Dependencias
+
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 
-// Configuración de JWT Authentication
+
+builder.Services.AddScoped<IUserService, UserService>();
+
 var jwtKey = builder.Configuration["Jwt:Key"]
-    ?? throw new InvalidOperationException("La clave JWT no está configurada.");
+    ?? throw new InvalidOperationException(
+        "La clave JWT no está configurada."
+    );
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -43,7 +47,6 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
-// Configuración de CORS para Angular
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
@@ -57,25 +60,19 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddOpenApi();
 
-// --- 2. Construcción de la App ---
 var app = builder.Build();
 
-// --- 3. Middlewares (DESPUÉS de builder.Build()) ---
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
-
-// Activar CORS
 app.UseCors("Frontend");
 
-// Middlewares de Autenticación y Autorización (¡El orden importa!)
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Mapear los Controladores de la API
 app.MapControllers();
 
 app.Run();

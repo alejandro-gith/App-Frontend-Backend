@@ -1,1 +1,9 @@
+@if (canViewUsers()) {
+  <nav aria-label="Menú principal">
+    <a routerLink="/products">Productos</a>
+    |
+    <a routerLink="/users">Usuarios</a>
+  </nav>
+}
+
 <router-outlet></router-outlet>

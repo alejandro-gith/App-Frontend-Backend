@@ -13,7 +13,9 @@ public static class InMemoryData
             Username = "admin",
             Email = "admin@miapp.com",
             Password = "123",
-            Role = UserRole.Administrator
+            Role = UserRole.Administrator,
+            FullName = "Administrador de Prueba",
+            Phone = "0000000001",
         },
 
         new User
@@ -22,7 +24,9 @@ public static class InMemoryData
             Username = "cliente",
             Email = "cliente@miapp.com",
             Password = "123",
-            Role = UserRole.Client
+            Role = UserRole.Client,
+            FullName = "Cliente de Prueba",
+            Phone = "0000000002",
         },
 
         new User
@@ -31,7 +35,9 @@ public static class InMemoryData
             Username = "auditor",
             Email = "auditor@miapp.com",
             Password = "123",
-            Role = UserRole.Auditor
+            Role = UserRole.Auditor,
+            FullName = "Auditor de Prueba",
+            Phone = "0000000003",
         }
     };
 
