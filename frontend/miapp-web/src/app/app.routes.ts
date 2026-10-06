@@ -11,6 +11,9 @@ import { ProductFormComponent } from './features/products/pages/product-form/pro
 import { CatalogComponent } from './features/products/pages/product-list/catalog.component';
 import { DetailComponent } from './features/products/pages/product-list/detail/detail.component';
 
+import { UserList } from './features/users/pages/user-list/user-list';
+import { usersGuard } from './core/guards/users-guard';
+
 export const routes: Routes = [
   {
     path: 'login',
@@ -59,6 +62,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
+  {
+    path: 'users',
+    component: UserList,
+    canActivate: [usersGuard]
+  },
   {
     path: '',
     redirectTo: 'login',

@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 import { AuthService } from '../../../../core/services/auth.service';
 import {
@@ -14,8 +15,10 @@ import { ProductCardComponent }
 @Component({
   selector: 'app-product-list',
   standalone: true,
+  
   imports: [
     CommonModule,
+    RouterLink,
     ProductCardComponent
   ],
   template: `
@@ -48,6 +51,11 @@ import { ProductCardComponent }
       </app-product-card>
 
     </div>
+    <div class="mb-3">
+  <a routerLink="/catalog" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2">
+    <span>←</span> Volver al Catálogo
+  </a>
+</div>
   `
 })
 export class ProductList implements OnInit {
@@ -61,7 +69,8 @@ export class ProductList implements OnInit {
   constructor(
     public authService: AuthService,
     private productService: ProductService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -69,21 +78,26 @@ export class ProductList implements OnInit {
   }
 
   loadProducts(): void {
-    this.loading = true;
-    this.errorMessage = '';
+  this.loading = true;
+  this.errorMessage = '';
 
-    this.productService.getProducts().subscribe({
-      next: (products) => {
-        this.products = products;
-        this.loading = false;
-      },
-      error: () => {
-        this.errorMessage =
-          'No se pudieron cargar los productos.';
-        this.loading = false;
-      }
-    });
-  }
+  this.productService.getProducts().subscribe({
+    next: (products) => {
+      this.products = products;
+      this.loading = false;
+
+      this.cdr.detectChanges();
+    },
+    error: () => {
+      this.errorMessage =
+        'No se pudieron cargar los productos.';
+
+      this.loading = false;
+
+      this.cdr.detectChanges();
+    }
+  });
+}
 
   logout(): void {
     this.authService.logout();
